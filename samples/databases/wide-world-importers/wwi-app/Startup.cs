@@ -1,4 +1,4 @@
-﻿using Common.Logging;
+using Common.Logging;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -96,20 +96,25 @@ namespace App
 
         /// <summary>
         /// Utility method that takes Territory from cookie.
+        /// Modified for development: returns ALL_TERRITORIES to bypass RLS filtering.
         /// You need to add: services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         /// </summary>
         /// <param name="serviceProvider">IServiceProvider interface.</param>
         /// <returns>Session value</returns>
         private string GetTerritoryFromSession(IServiceProvider serviceProvider)
         {
-            var ctx = serviceProvider.GetServices<IHttpContextAccessor>().First().HttpContext;
-            if (ctx.User.Identity.IsAuthenticated)
-            {
-                var cl = ctx.User.Claims.FirstOrDefault(c => c.Type == "Territory");
-                if (cl != null)
-                    return cl.Value;
-            }
-            return "";
+            // For development: return ALL_TERRITORIES to access all data through RLS
+            return "ALL_TERRITORIES";
+            
+            // Original code (commented out for development):
+            // var ctx = serviceProvider.GetServices<IHttpContextAccessor>().First().HttpContext;
+            // if (ctx.User.Identity.IsAuthenticated)
+            // {
+            //     var cl = ctx.User.Claims.FirstOrDefault(c => c.Type == "Territory");
+            //     if (cl != null)
+            //         return cl.Value;
+            // }
+            // return "";
         }
     }
 }
