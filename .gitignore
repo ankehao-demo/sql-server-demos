@@ -442,6 +442,10 @@ samples/features/sql-management-objects/src/out/CodeCoverage/CodeCoverage.config
 *.pem
 *.p12
 
+# Environment variables (contains sensitive data)
+.envrc
+.env
+
 # Composer
 /vendor/
 /samples/databases/wide-world-importers/wwi-ssdt/wwi-ssdt/WideWorldImporters.publish.xml
