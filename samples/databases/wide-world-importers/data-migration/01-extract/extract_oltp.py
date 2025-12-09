@@ -243,6 +243,10 @@ def extract_archive_table(conn: pyodbc.Connection, schema: str, table: str,
     # Archive tables in SQL Server have _Archive suffix
     sql_table = table.replace('_archive', '_Archive')
     
+    # Map archive table to its base table for geography column lookup
+    base_table = table.replace('_archive', '')
+    full_base_table = f"{pg_schema}.{base_table}"
+    
     result = {
         'schema': schema,
         'table': sql_table,
@@ -280,9 +284,27 @@ def extract_archive_table(conn: pyodbc.Connection, schema: str, table: str,
         row_count = get_row_count(conn, schema, sql_table)
         logger.info(f"Extracting archive {schema}.{sql_table} ({row_count} rows)")
         
-        # Build simple select query for archive tables
+        # Get geography columns from base table config
+        geo_columns = set()
+        if full_base_table in GEOGRAPHY_COLUMNS:
+            geo_columns = set(col.lower() for col in GEOGRAPHY_COLUMNS[full_base_table])
+        
+        # Build select query with geography handling
+        select_parts = []
+        for col_name, col_type, col_length in columns:
+            col_lower = col_name.lower()
+            if col_lower in geo_columns or col_type == 'geography':
+                select_parts.append(f"[{col_name}].STAsText() AS [{col_name}]")
+            elif col_type in ('varbinary', 'binary', 'image'):
+                select_parts.append(
+                    f"CASE WHEN [{col_name}] IS NULL THEN NULL "
+                    f"ELSE CAST('' AS VARCHAR(MAX)) END AS [{col_name}]"
+                )
+            else:
+                select_parts.append(f"[{col_name}]")
+        
         col_names = [col[0] for col in columns]
-        select_clause = ', '.join([f"[{c}]" for c in col_names])
+        select_clause = ', '.join(select_parts)
         query = f"SELECT {select_clause} FROM [{schema}].[{sql_table}]"
         
         # Prepare output file

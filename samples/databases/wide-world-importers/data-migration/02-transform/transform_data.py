@@ -17,6 +17,9 @@ import re
 from datetime import datetime
 from typing import Optional, Any
 
+# Increase CSV field size limit for large geography data (country borders)
+csv.field_size_limit(sys.maxsize)
+
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
