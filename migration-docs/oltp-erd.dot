@@ -3,13 +3,14 @@ digraph OLTP_ERD {
     rankdir=LR;
     graph [
         splines=ortho,
-        nodesep=0.8,
-        ranksep=1.2,
+        nodesep=1.8,
+        ranksep=2.5,
         fontname="Arial",
-        fontsize=12,
-        label="Wide World Importers OLTP Database - Entity Relationship Diagram\n(Yellow = Temporal Tables, Red = Memory-Optimized Tables)",
+        fontsize=14,
+        label="Wide World Importers OLTP Database - Entity Relationship Diagram\n(Yellow = Temporal Tables, Red = Memory-Optimized Tables)\nSee SVG version for better zooming",
         labelloc=t,
-        pad=0.5
+        pad=1.0,
+        size="20,20"
     ];
     node [
         shape=box,

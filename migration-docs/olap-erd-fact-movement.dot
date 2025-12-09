@@ -1,0 +1,45 @@
+digraph OLAP_Fact_Movement {
+    rankdir=LR;
+    graph [
+        splines=ortho,
+        nodesep=1.5,
+        ranksep=2.5,
+        fontname="Arial",
+        fontsize=14,
+        label="Fact.Movement - Star Schema Relationships\n(Partitioned by Date + Columnstore Index)",
+        labelloc=t,
+        pad=0.8
+    ];
+    node [
+        shape=box,
+        style="filled,rounded",
+        fontname="Arial",
+        fontsize=11,
+        width=2.5,
+        height=0.7
+    ];
+    edge [
+        fontname="Arial",
+        fontsize=10,
+        color="#F57C00",
+        penwidth=2.0,
+        arrowsize=1.0
+    ];
+
+    // Dimension Tables
+    DimDate [label="Dimension.Date\n(Calendar)", fillcolor="#BBDEFB"];
+    DimStockItem [label="Dimension.StockItem\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimCustomer [label="Dimension.Customer\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimSupplier [label="Dimension.Supplier\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimTransactionType [label="Dimension.TransactionType", fillcolor="#BBDEFB"];
+
+    // Fact Table
+    FactMovement [label="Fact.Movement\n(Partitioned by Date)", fillcolor="#FFE0B2", penwidth=2];
+
+    // Relationships
+    DimDate -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimStockItem -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimCustomer -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimSupplier -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimTransactionType -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5];
+}

@@ -3,13 +3,14 @@ digraph OLAP_ERD {
     rankdir=LR;
     graph [
         splines=ortho,
-        nodesep=1.0,
-        ranksep=1.5,
+        nodesep=2.0,
+        ranksep=3.0,
         fontname="Arial",
-        fontsize=12,
-        label="Wide World Importers OLAP Database - Star Schema ERD\n(All Fact Tables use Partitioning + Columnstore Indexes)",
+        fontsize=14,
+        label="Wide World Importers OLAP Database - Star Schema Overview\n(All Fact Tables use Partitioning + Columnstore Indexes)\nSee individual fact diagrams for clearer relationships",
         labelloc=t,
-        pad=0.5
+        pad=1.0,
+        size="18,24"
     ];
     node [
         shape=box,

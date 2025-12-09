@@ -1,0 +1,45 @@
+digraph OLAP_Fact_Sale {
+    rankdir=LR;
+    graph [
+        splines=ortho,
+        nodesep=1.5,
+        ranksep=2.5,
+        fontname="Arial",
+        fontsize=14,
+        label="Fact.Sale - Star Schema Relationships\n(Partitioned by Date + Columnstore Index)",
+        labelloc=t,
+        pad=0.8
+    ];
+    node [
+        shape=box,
+        style="filled,rounded",
+        fontname="Arial",
+        fontsize=11,
+        width=2.5,
+        height=0.7
+    ];
+    edge [
+        fontname="Arial",
+        fontsize=10,
+        color="#C62828",
+        penwidth=2.0,
+        arrowsize=1.0
+    ];
+
+    // Dimension Tables
+    DimCity [label="Dimension.City\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimCustomer [label="Dimension.Customer\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimDate [label="Dimension.Date\n(Calendar)", fillcolor="#BBDEFB"];
+    DimEmployee [label="Dimension.Employee\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimStockItem [label="Dimension.StockItem\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+
+    // Fact Table
+    FactSale [label="Fact.Sale\n(Partitioned by Date)", fillcolor="#FFCDD2", penwidth=2];
+
+    // Relationships
+    DimCity -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimCustomer -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimDate -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimEmployee -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimStockItem -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5];
+}
