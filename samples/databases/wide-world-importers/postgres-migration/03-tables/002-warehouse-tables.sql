@@ -41,8 +41,8 @@ CREATE TABLE warehouse.stockgroups (
 
 -- Warehouse.StockItems table (temporal)
 -- Note: Tags and SearchDetails are computed columns in SQL Server
--- Tags uses json_query which we'll handle via a view or trigger
--- SearchDetails is a simple concatenation
+-- Tags uses json_query which we'll handle via a JSONB column
+-- SearchDetails is a generated column (concatenation of stockitemname and marketingcomments)
 CREATE TABLE warehouse.stockitems (
     stockitemid integer NOT NULL DEFAULT nextval('sequences.stockitemid'),
     stockitemname varchar(100) NOT NULL,
@@ -64,6 +64,8 @@ CREATE TABLE warehouse.stockitems (
     internalcomments text NULL,
     photo bytea NULL,
     customfields text NULL,
+    tags jsonb NULL,
+    searchdetails text GENERATED ALWAYS AS (stockitemname || ' ' || COALESCE(marketingcomments, '')) STORED,
     lasteditedby integer NOT NULL,
     validfrom timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     validto timestamp NOT NULL DEFAULT '9999-12-31 23:59:59.999999',
@@ -72,6 +74,7 @@ CREATE TABLE warehouse.stockitems (
 );
 
 -- Warehouse.StockItemHoldings table (non-temporal)
+-- Note: lastreceiptdate added for Integration ETL procedures
 CREATE TABLE warehouse.stockitemholdings (
     stockitemid integer NOT NULL,
     quantityonhand integer NOT NULL,
@@ -80,6 +83,7 @@ CREATE TABLE warehouse.stockitemholdings (
     lastcostprice numeric(18,2) NOT NULL,
     reorderlevel integer NOT NULL,
     targetstocklevel integer NOT NULL,
+    lastreceiptdate date NULL,
     lasteditedby integer NOT NULL,
     lasteditedwhen timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_warehouse_stockitemholdings PRIMARY KEY (stockitemid)
