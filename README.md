@@ -46,3 +46,5 @@ These samples and templates are all licensed under the MIT license. See the lice
 
 ## Questions
 Email questions to: sqlserversamples@microsoft.com.
+
+<!-- Dummy test change for PR verification -->
