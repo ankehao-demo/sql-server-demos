@@ -1,0 +1,47 @@
+digraph OLAP_Fact_Transaction {
+    rankdir=LR;
+    graph [
+        splines=ortho,
+        nodesep=1.5,
+        ranksep=2.5,
+        fontname="Arial",
+        fontsize=14,
+        label="Fact.Transaction - Star Schema Relationships\n(Partitioned by Date + Columnstore Index)",
+        labelloc=t,
+        pad=0.8
+    ];
+    node [
+        shape=box,
+        style="filled,rounded",
+        fontname="Arial",
+        fontsize=11,
+        width=2.5,
+        height=0.7
+    ];
+    edge [
+        fontname="Arial",
+        fontsize=10,
+        color="#7B1FA2",
+        penwidth=2.0,
+        arrowsize=1.0
+    ];
+
+    // Dimension Tables
+    DimCity [label="Dimension.City\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimCustomer [label="Dimension.Customer\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimDate [label="Dimension.Date\n(Calendar)", fillcolor="#BBDEFB"];
+    DimPaymentMethod [label="Dimension.PaymentMethod", fillcolor="#BBDEFB"];
+    DimSupplier [label="Dimension.Supplier\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+    DimTransactionType [label="Dimension.TransactionType", fillcolor="#BBDEFB"];
+
+    // Fact Table
+    FactTransaction [label="Fact.Transaction\n(Partitioned by Date)", fillcolor="#E1BEE7", penwidth=2];
+
+    // Relationships
+    DimCity -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimCustomer -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimDate -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimPaymentMethod -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimSupplier -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+    DimTransactionType -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5];
+}
