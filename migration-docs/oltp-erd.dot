@@ -1,0 +1,174 @@
+digraph OLTP_ERD {
+    // Graph settings for clarity
+    rankdir=LR;
+    graph [
+        splines=ortho,
+        nodesep=0.8,
+        ranksep=1.2,
+        fontname="Arial",
+        fontsize=12,
+        label="Wide World Importers OLTP Database - Entity Relationship Diagram\n(Yellow = Temporal Tables, Red = Memory-Optimized Tables)",
+        labelloc=t,
+        pad=0.5
+    ];
+    node [
+        shape=box,
+        style="filled,rounded",
+        fontname="Arial",
+        fontsize=10,
+        width=2.0,
+        height=0.5
+    ];
+    edge [
+        fontname="Arial",
+        fontsize=9,
+        color="#666666",
+        arrowsize=0.8
+    ];
+
+    // ==================== APPLICATION SCHEMA (Reference Data) ====================
+    subgraph cluster_application {
+        label="Application Schema\n(Reference Data)";
+        style=filled;
+        fillcolor="#E3F2FD";
+        color="#1976D2";
+        fontsize=11;
+        fontcolor="#1976D2";
+
+        Countries [label="Countries", fillcolor="#FFEB3B"];
+        StateProvinces [label="StateProvinces", fillcolor="#FFEB3B"];
+        Cities [label="Cities", fillcolor="#FFEB3B"];
+        People [label="People", fillcolor="#FFEB3B"];
+        DeliveryMethods [label="DeliveryMethods", fillcolor="#FFEB3B"];
+        PaymentMethods [label="PaymentMethods", fillcolor="#FFEB3B"];
+        TransactionTypes [label="TransactionTypes", fillcolor="#FFEB3B"];
+    }
+
+    // ==================== SALES SCHEMA ====================
+    subgraph cluster_sales {
+        label="Sales Schema";
+        style=filled;
+        fillcolor="#E8F5E9";
+        color="#388E3C";
+        fontsize=11;
+        fontcolor="#388E3C";
+
+        BuyingGroups [label="BuyingGroups", fillcolor="#FFEB3B"];
+        CustomerCategories [label="CustomerCategories", fillcolor="#FFEB3B"];
+        Customers [label="Customers", fillcolor="#FFEB3B"];
+        Orders [label="Orders", fillcolor="#FFEB3B"];
+        OrderLines [label="OrderLines", fillcolor="#FFEB3B"];
+        Invoices [label="Invoices", fillcolor="#FFEB3B"];
+        InvoiceLines [label="InvoiceLines", fillcolor="#FFEB3B"];
+        CustomerTransactions [label="CustomerTransactions", fillcolor="#FFEB3B"];
+        SpecialDeals [label="SpecialDeals", fillcolor="#FFEB3B"];
+    }
+
+    // ==================== PURCHASING SCHEMA ====================
+    subgraph cluster_purchasing {
+        label="Purchasing Schema";
+        style=filled;
+        fillcolor="#FFF3E0";
+        color="#F57C00";
+        fontsize=11;
+        fontcolor="#F57C00";
+
+        SupplierCategories [label="SupplierCategories", fillcolor="#FFEB3B"];
+        Suppliers [label="Suppliers", fillcolor="#FFEB3B"];
+        PurchaseOrders [label="PurchaseOrders", fillcolor="#FFEB3B"];
+        PurchaseOrderLines [label="PurchaseOrderLines", fillcolor="#FFEB3B"];
+        SupplierTransactions [label="SupplierTransactions", fillcolor="#FFEB3B"];
+    }
+
+    // ==================== WAREHOUSE SCHEMA ====================
+    subgraph cluster_warehouse {
+        label="Warehouse Schema";
+        style=filled;
+        fillcolor="#F3E5F5";
+        color="#7B1FA2";
+        fontsize=11;
+        fontcolor="#7B1FA2";
+
+        Colors [label="Colors", fillcolor="#FFEB3B"];
+        PackageTypes [label="PackageTypes", fillcolor="#FFEB3B"];
+        StockGroups [label="StockGroups", fillcolor="#FFEB3B"];
+        StockItems [label="StockItems", fillcolor="#FFEB3B"];
+        StockItemHoldings [label="StockItemHoldings", fillcolor="#FFEB3B"];
+        StockItemStockGroups [label="StockItemStockGroups\n(Junction)", fillcolor="#FFE0B2", style="filled,rounded,bold"];
+        StockItemTransactions [label="StockItemTransactions", fillcolor="#FFEB3B"];
+        ColdRoomTemperatures [label="ColdRoomTemperatures", fillcolor="#FFCDD2"];
+        VehicleTemperatures [label="VehicleTemperatures", fillcolor="#FFCDD2"];
+    }
+
+    // ==================== RELATIONSHIPS ====================
+    
+    // Application Schema Internal Relationships
+    Countries -> StateProvinces [taillabel="1", headlabel="N", labeldistance=2.5];
+    StateProvinces -> Cities [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Sales Schema - Customer Hierarchy
+    BuyingGroups -> Customers [taillabel="1", headlabel="N", labeldistance=2.5];
+    CustomerCategories -> Customers [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Sales Schema - Order Flow
+    Customers -> Orders [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.5];
+    Orders -> OrderLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.5];
+    
+    // Sales Schema - Invoice Flow
+    Customers -> Invoices [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.5];
+    Orders -> Invoices [taillabel="1", headlabel="N", labeldistance=2.5];
+    Invoices -> InvoiceLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.5];
+    
+    // Sales Schema - Transactions
+    Customers -> CustomerTransactions [taillabel="1", headlabel="N", labeldistance=2.5];
+    Invoices -> CustomerTransactions [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Sales Schema - Special Deals
+    BuyingGroups -> SpecialDeals [taillabel="1", headlabel="N", labeldistance=2.5];
+    CustomerCategories -> SpecialDeals [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Purchasing Schema - Supplier Hierarchy
+    SupplierCategories -> Suppliers [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Purchasing Schema - Purchase Flow
+    Suppliers -> PurchaseOrders [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.5];
+    PurchaseOrders -> PurchaseOrderLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.5];
+    Suppliers -> SupplierTransactions [taillabel="1", headlabel="N", labeldistance=2.5];
+    PurchaseOrders -> SupplierTransactions [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Warehouse Schema - Stock Item Hierarchy
+    Colors -> StockItems [taillabel="1", headlabel="N", labeldistance=2.5];
+    PackageTypes -> StockItems [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Warehouse Schema - Stock Groups (Many-to-Many via Junction)
+    StockItems -> StockItemStockGroups [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.5];
+    StockGroups -> StockItemStockGroups [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.5];
+    
+    // Warehouse Schema - Stock Holdings and Transactions
+    StockItems -> StockItemHoldings [taillabel="1", headlabel="1", labeldistance=2.5];
+    StockItems -> StockItemTransactions [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Cross-Schema Relationships (Application -> Others)
+    Cities -> Customers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    Cities -> Suppliers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    People -> Customers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    People -> Suppliers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    People -> Orders [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    People -> Invoices [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    People -> PurchaseOrders [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    DeliveryMethods -> Customers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    DeliveryMethods -> Suppliers [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    PaymentMethods -> CustomerTransactions [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    TransactionTypes -> CustomerTransactions [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    TransactionTypes -> SupplierTransactions [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    TransactionTypes -> StockItemTransactions [taillabel="1", headlabel="N", labeldistance=2.5, style=dashed, color="#999999"];
+    
+    // Cross-Schema Relationships (Warehouse -> Sales/Purchasing)
+    StockItems -> OrderLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.5];
+    StockItems -> InvoiceLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.5];
+    StockItems -> PurchaseOrderLines [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.5];
+    StockItems -> SpecialDeals [taillabel="1", headlabel="N", labeldistance=2.5];
+    
+    // Supplier -> Stock Items
+    Suppliers -> StockItems [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.5];
+}

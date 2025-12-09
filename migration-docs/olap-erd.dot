@@ -1,0 +1,109 @@
+digraph OLAP_ERD {
+    // Graph settings for clarity
+    rankdir=LR;
+    graph [
+        splines=ortho,
+        nodesep=1.0,
+        ranksep=1.5,
+        fontname="Arial",
+        fontsize=12,
+        label="Wide World Importers OLAP Database - Star Schema ERD\n(All Fact Tables use Partitioning + Columnstore Indexes)",
+        labelloc=t,
+        pad=0.5
+    ];
+    node [
+        shape=box,
+        style="filled,rounded",
+        fontname="Arial",
+        fontsize=10,
+        width=2.2,
+        height=0.6
+    ];
+    edge [
+        fontname="Arial",
+        fontsize=9,
+        color="#666666",
+        arrowsize=0.8
+    ];
+
+    // ==================== DIMENSION TABLES ====================
+    subgraph cluster_dimensions {
+        label="Dimension Tables\n(Reference/Lookup Data)";
+        style=filled;
+        fillcolor="#E3F2FD";
+        color="#1976D2";
+        fontsize=11;
+        fontcolor="#1976D2";
+
+        // Use rank=same to align dimensions horizontally
+        {rank=same; DimCity; DimCustomer; DimDate; DimEmployee;}
+        {rank=same; DimPaymentMethod; DimStockItem; DimSupplier; DimTransactionType;}
+
+        DimCity [label="Dimension.City\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+        DimCustomer [label="Dimension.Customer\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+        DimDate [label="Dimension.Date\n(Calendar)", fillcolor="#BBDEFB"];
+        DimEmployee [label="Dimension.Employee\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+        DimPaymentMethod [label="Dimension.PaymentMethod", fillcolor="#BBDEFB"];
+        DimStockItem [label="Dimension.StockItem\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+        DimSupplier [label="Dimension.Supplier\n(Type 2 SCD)", fillcolor="#BBDEFB"];
+        DimTransactionType [label="Dimension.TransactionType", fillcolor="#BBDEFB"];
+    }
+
+    // ==================== FACT TABLES ====================
+    subgraph cluster_facts {
+        label="Fact Tables\n(Partitioned + Columnstore)";
+        style=filled;
+        fillcolor="#FFEBEE";
+        color="#C62828";
+        fontsize=11;
+        fontcolor="#C62828";
+
+        FactSale [label="Fact.Sale\n(Partitioned by Date)", fillcolor="#FFCDD2"];
+        FactOrder [label="Fact.Order\n(Partitioned by Date)", fillcolor="#FFCDD2"];
+        FactPurchase [label="Fact.Purchase\n(Partitioned by Date)", fillcolor="#FFCDD2"];
+        FactMovement [label="Fact.Movement\n(Partitioned by Date)", fillcolor="#FFCDD2"];
+        FactTransaction [label="Fact.Transaction\n(Partitioned by Date)", fillcolor="#FFCDD2"];
+        FactStockHolding [label="Fact.StockHolding\n(Snapshot)", fillcolor="#FFCDD2"];
+    }
+
+    // ==================== STAR SCHEMA RELATIONSHIPS ====================
+    // Fact.Sale relationships (core sales fact)
+    DimCity -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5, color="#C62828", penwidth=1.5];
+    DimCustomer -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5, color="#C62828", penwidth=1.5];
+    DimDate -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5, color="#C62828", penwidth=1.5];
+    DimEmployee -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5, color="#C62828", penwidth=1.5];
+    DimStockItem -> FactSale [taillabel="1", headlabel="N", labeldistance=2.5, color="#C62828", penwidth=1.5];
+
+    // Fact.Order relationships
+    DimCity -> FactOrder [taillabel="1", headlabel="N", labeldistance=2.5, color="#1976D2", penwidth=1.2];
+    DimCustomer -> FactOrder [taillabel="1", headlabel="N", labeldistance=2.5, color="#1976D2", penwidth=1.2];
+    DimDate -> FactOrder [taillabel="1", headlabel="N", labeldistance=2.5, color="#1976D2", penwidth=1.2];
+    DimEmployee -> FactOrder [taillabel="1", headlabel="N", labeldistance=2.5, color="#1976D2", penwidth=1.2];
+    DimStockItem -> FactOrder [taillabel="1", headlabel="N", labeldistance=2.5, color="#1976D2", penwidth=1.2];
+
+    // Fact.Purchase relationships
+    DimDate -> FactPurchase [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.2];
+    DimEmployee -> FactPurchase [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.2];
+    DimStockItem -> FactPurchase [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.2];
+    DimSupplier -> FactPurchase [taillabel="1", headlabel="N", labeldistance=2.5, color="#388E3C", penwidth=1.5];
+
+    // Fact.Movement relationships
+    DimDate -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.2];
+    DimStockItem -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.2];
+    DimCustomer -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.2];
+    DimSupplier -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.2];
+    DimTransactionType -> FactMovement [taillabel="1", headlabel="N", labeldistance=2.5, color="#F57C00", penwidth=1.2];
+
+    // Fact.Transaction relationships
+    DimCity -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+    DimCustomer -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+    DimDate -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+    DimPaymentMethod -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+    DimSupplier -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+    DimTransactionType -> FactTransaction [taillabel="1", headlabel="N", labeldistance=2.5, color="#7B1FA2", penwidth=1.2];
+
+    // Fact.StockHolding relationships
+    DimDate -> FactStockHolding [taillabel="1", headlabel="N", labeldistance=2.5, color="#00796B", penwidth=1.2];
+    DimEmployee -> FactStockHolding [taillabel="1", headlabel="N", labeldistance=2.5, color="#00796B", penwidth=1.2];
+    DimStockItem -> FactStockHolding [taillabel="1", headlabel="N", labeldistance=2.5, color="#00796B", penwidth=1.2];
+}
