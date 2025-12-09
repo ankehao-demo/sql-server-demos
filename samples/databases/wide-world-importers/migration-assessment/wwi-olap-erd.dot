@@ -1,0 +1,304 @@
+// Wide World Importers OLAP (Data Warehouse) Database - Entity Relationship Diagram
+// Generated for SQL Server to PostgreSQL Migration Assessment
+// Star Schema Design
+
+digraph WWI_OLAP {
+    // Graph settings
+    graph [
+        rankdir=TB
+        splines=ortho
+        nodesep=1.0
+        ranksep=1.5
+        fontname="Helvetica"
+        fontsize=12
+        label="Wide World Importers Data Warehouse (OLAP)\nStar Schema Entity Relationship Diagram\n(All Fact tables use Clustered Columnstore Indexes and Date Partitioning)"
+        labelloc=t
+        bgcolor="white"
+    ]
+    
+    node [
+        shape=record
+        fontname="Helvetica"
+        fontsize=10
+        style=filled
+    ]
+    
+    edge [
+        fontname="Helvetica"
+        fontsize=8
+        arrowhead=crow
+        arrowtail=none
+    ]
+
+    // ==================== DIMENSION TABLES ====================
+    subgraph cluster_Dimensions {
+        label="Dimension Tables"
+        style=filled
+        fillcolor="#E3F2FD"
+        fontsize=14
+        fontcolor="#1565C0"
+        
+        DimCity [
+            label="{Dimension.City|City Key (PK, Surrogate)\lWWI City ID (Natural Key)\l|City\lState Province\lCountry\lContinent\lSales Territory\lRegion\lSubregion\lLocation (geography)\lLatest Recorded Population\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimCustomer [
+            label="{Dimension.Customer|Customer Key (PK, Surrogate)\lWWI Customer ID (Natural Key)\l|Customer\lBill To Customer\lCategory\lBuying Group\lPrimary Contact\lPostal Code\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimDate [
+            label="{Dimension.Date|Date (PK)\l|Day Number\lDay\lMonth\lShort Month\lCalendar Month Number\lCalendar Month Label\lCalendar Year\lCalendar Year Label\lFiscal Month Number\lFiscal Month Label\lFiscal Year\lFiscal Year Label\lISO Week Number\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimEmployee [
+            label="{Dimension.Employee|Employee Key (PK, Surrogate)\lWWI Employee ID (Natural Key)\l|Employee\lPreferred Name\lIs Salesperson\lPhoto (varbinary)\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimPaymentMethod [
+            label="{Dimension.Payment Method|Payment Method Key (PK, Surrogate)\lWWI Payment Method ID (Natural Key)\l|Payment Method\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimStockItem [
+            label="{Dimension.Stock Item|Stock Item Key (PK, Surrogate)\lWWI Stock Item ID (Natural Key)\l|Stock Item\lColor\lSelling Package\lBuying Package\lBrand\lSize\lLead Time Days\lQuantity Per Outer\lIs Chiller Stock\lBarcode\lTax Rate\lUnit Price\lRecommended Retail Price\lTypical Weight Per Unit\lPhoto (varbinary)\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimSupplier [
+            label="{Dimension.Supplier|Supplier Key (PK, Surrogate)\lWWI Supplier ID (Natural Key)\l|Supplier\lCategory\lPrimary Contact\lSupplier Reference\lPayment Days\lPostal Code\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+        
+        DimTransactionType [
+            label="{Dimension.Transaction Type|Transaction Type Key (PK, Surrogate)\lWWI Transaction Type ID (Natural Key)\l|Transaction Type\lValid From\lValid To\lLineage Key (FK)\l}"
+            fillcolor="#BBDEFB"
+        ]
+    }
+
+    // ==================== FACT TABLES ====================
+    subgraph cluster_Facts {
+        label="Fact Tables (Clustered Columnstore + Partitioned by Date)"
+        style=filled
+        fillcolor="#FFF3E0"
+        fontsize=14
+        fontcolor="#E65100"
+        
+        FactSale [
+            label="{Fact.Sale|Sale Key (PK)\l|City Key (FK)\lCustomer Key (FK)\lBill To Customer Key (FK)\lStock Item Key (FK)\lInvoice Date Key (FK)\lDelivery Date Key (FK)\lSalesperson Key (FK)\l|WWI Invoice ID\lDescription\lPackage\lQuantity\lUnit Price\lTax Rate\lTotal Excluding Tax\lTax Amount\lProfit\lTotal Including Tax\lTotal Dry Items\lTotal Chiller Items\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE + PARTITIONED"
+        ]
+        
+        FactOrder [
+            label="{Fact.Order|Order Key (PK)\l|City Key (FK)\lCustomer Key (FK)\lStock Item Key (FK)\lOrder Date Key (FK)\lPicked Date Key (FK)\lSalesperson Key (FK)\lPicker Key (FK)\l|WWI Order ID\lWWI Backorder ID\lDescription\lPackage\lQuantity\lUnit Price\lTax Rate\lTotal Excluding Tax\lTax Amount\lTotal Including Tax\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE + PARTITIONED"
+        ]
+        
+        FactPurchase [
+            label="{Fact.Purchase|Purchase Key (PK)\l|Date Key (FK)\lSupplier Key (FK)\lStock Item Key (FK)\l|WWI Purchase Order ID\lOrdered Outers\lOrdered Quantity\lReceived Outers\lPackage\lIs Order Finalized\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE + PARTITIONED"
+        ]
+        
+        FactMovement [
+            label="{Fact.Movement|Movement Key (PK)\l|Date Key (FK)\lStock Item Key (FK)\lCustomer Key (FK)\lSupplier Key (FK)\lTransaction Type Key (FK)\l|WWI Stock Item Transaction ID\lWWI Invoice ID\lWWI Purchase Order ID\lQuantity\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE + PARTITIONED"
+        ]
+        
+        FactTransaction [
+            label="{Fact.Transaction|Transaction Key (PK)\l|Date Key (FK)\lCustomer Key (FK)\lBill To Customer Key (FK)\lSupplier Key (FK)\lTransaction Type Key (FK)\lPayment Method Key (FK)\l|WWI Customer Transaction ID\lWWI Supplier Transaction ID\lWWI Invoice ID\lWWI Purchase Order ID\lSupplier Invoice Number\lTotal Excluding Tax\lTax Amount\lTotal Including Tax\lOutstanding Balance\lIs Finalized\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE + PARTITIONED"
+        ]
+        
+        FactStockHolding [
+            label="{Fact.Stock Holding|Stock Holding Key (PK)\l|Stock Item Key (FK)\l|Quantity On Hand\lBin Location\lLast Stocktake Quantity\lLast Cost Price\lReorder Level\lTarget Stock Level\lLineage Key (FK)\l}"
+            fillcolor="#FFE0B2"
+            tooltip="CLUSTERED COLUMNSTORE"
+        ]
+    }
+
+    // ==================== INTEGRATION SCHEMA ====================
+    subgraph cluster_Integration {
+        label="Integration Schema (ETL Staging)"
+        style=filled
+        fillcolor="#E8F5E9"
+        fontsize=14
+        fontcolor="#2E7D32"
+        
+        IntCity [
+            label="{Integration.City_Staging|City Staging Key (PK)\l|WWI City ID\lCity\lState Province\lCountry\lContinent\lSales Territory\lRegion\lSubregion\lLocation (geography)\lLatest Recorded Population\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntCustomer [
+            label="{Integration.Customer_Staging|Customer Staging Key (PK)\l|WWI Customer ID\lCustomer\lBill To Customer\lCategory\lBuying Group\lPrimary Contact\lPostal Code\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntEmployee [
+            label="{Integration.Employee_Staging|Employee Staging Key (PK)\l|WWI Employee ID\lEmployee\lPreferred Name\lIs Salesperson\lPhoto (varbinary)\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntMovement [
+            label="{Integration.Movement_Staging|Movement Staging Key (PK)\l|Date Key\lStock Item Key\lCustomer Key\lSupplier Key\lTransaction Type Key\lWWI Stock Item Transaction ID\lWWI Invoice ID\lWWI Purchase Order ID\lQuantity\lLast Modifed When\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntOrder [
+            label="{Integration.Order_Staging|Order Staging Key (PK)\l|Order Date Key\lPicked Date Key\lSalesperson Key\lPicker Key\lCity Key\lCustomer Key\lStock Item Key\lWWI Order ID\lWWI Backorder ID\lDescription\lPackage\lQuantity\lUnit Price\lTax Rate\lTotal Excluding Tax\lTax Amount\lTotal Including Tax\lLast Modified When\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntPaymentMethod [
+            label="{Integration.PaymentMethod_Staging|Payment Method Staging Key (PK)\l|WWI Payment Method ID\lPayment Method\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntPurchase [
+            label="{Integration.Purchase_Staging|Purchase Staging Key (PK)\l|Date Key\lSupplier Key\lStock Item Key\lWWI Purchase Order ID\lOrdered Outers\lOrdered Quantity\lReceived Outers\lPackage\lIs Order Finalized\lLast Modified When\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntSale [
+            label="{Integration.Sale_Staging|Sale Staging Key (PK)\l|City Key\lCustomer Key\lBill To Customer Key\lStock Item Key\lInvoice Date Key\lDelivery Date Key\lSalesperson Key\lWWI Invoice ID\lDescription\lPackage\lQuantity\lUnit Price\lTax Rate\lTotal Excluding Tax\lTax Amount\lProfit\lTotal Including Tax\lTotal Dry Items\lTotal Chiller Items\lLast Modified When\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntStockHolding [
+            label="{Integration.StockHolding_Staging|Stock Holding Staging Key (PK)\l|Stock Item Key\lQuantity On Hand\lBin Location\lLast Stocktake Quantity\lLast Cost Price\lReorder Level\lTarget Stock Level\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntStockItem [
+            label="{Integration.StockItem_Staging|Stock Item Staging Key (PK)\l|WWI Stock Item ID\lStock Item\lColor\lSelling Package\lBuying Package\lBrand\lSize\lLead Time Days\lQuantity Per Outer\lIs Chiller Stock\lBarcode\lTax Rate\lUnit Price\lRecommended Retail Price\lTypical Weight Per Unit\lPhoto (varbinary)\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntSupplier [
+            label="{Integration.Supplier_Staging|Supplier Staging Key (PK)\l|WWI Supplier ID\lSupplier\lCategory\lPrimary Contact\lSupplier Reference\lPayment Days\lPostal Code\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntTransaction [
+            label="{Integration.Transaction_Staging|Transaction Staging Key (PK)\l|Date Key\lCustomer Key\lBill To Customer Key\lSupplier Key\lTransaction Type Key\lPayment Method Key\lWWI Customer Transaction ID\lWWI Supplier Transaction ID\lWWI Invoice ID\lWWI Purchase Order ID\lSupplier Invoice Number\lTotal Excluding Tax\lTax Amount\lTotal Including Tax\lOutstanding Balance\lIs Finalized\lLast Modified When\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        IntTransactionType [
+            label="{Integration.TransactionType_Staging|Transaction Type Staging Key (PK)\l|WWI Transaction Type ID\lTransaction Type\lValid From\lValid To\l}"
+            fillcolor="#C8E6C9"
+        ]
+        
+        Lineage [
+            label="{Integration.Lineage|Lineage Key (PK)\l|Data Load Started\lTable Name\lData Load Completed\lWas Successful\lSource System Cutoff Time\l}"
+            fillcolor="#A5D6A7"
+        ]
+        
+        ETLCutoff [
+            label="{Integration.ETL Cutoff|Table Name (PK)\l|Cutoff Time\l}"
+            fillcolor="#A5D6A7"
+        ]
+    }
+
+    // ==================== STAR SCHEMA RELATIONSHIPS ====================
+    
+    // Fact.Sale relationships
+    FactSale -> DimCity [label="City Key"]
+    FactSale -> DimCustomer [label="Customer Key"]
+    FactSale -> DimCustomer [label="Bill To Customer Key"]
+    FactSale -> DimStockItem [label="Stock Item Key"]
+    FactSale -> DimDate [label="Invoice Date Key"]
+    FactSale -> DimDate [label="Delivery Date Key"]
+    FactSale -> DimEmployee [label="Salesperson Key"]
+    FactSale -> Lineage [label="Lineage Key"]
+    
+    // Fact.Order relationships
+    FactOrder -> DimCity [label="City Key"]
+    FactOrder -> DimCustomer [label="Customer Key"]
+    FactOrder -> DimStockItem [label="Stock Item Key"]
+    FactOrder -> DimDate [label="Order Date Key"]
+    FactOrder -> DimDate [label="Picked Date Key"]
+    FactOrder -> DimEmployee [label="Salesperson Key"]
+    FactOrder -> DimEmployee [label="Picker Key"]
+    FactOrder -> Lineage [label="Lineage Key"]
+    
+    // Fact.Purchase relationships
+    FactPurchase -> DimDate [label="Date Key"]
+    FactPurchase -> DimSupplier [label="Supplier Key"]
+    FactPurchase -> DimStockItem [label="Stock Item Key"]
+    FactPurchase -> Lineage [label="Lineage Key"]
+    
+    // Fact.Movement relationships
+    FactMovement -> DimDate [label="Date Key"]
+    FactMovement -> DimStockItem [label="Stock Item Key"]
+    FactMovement -> DimCustomer [label="Customer Key"]
+    FactMovement -> DimSupplier [label="Supplier Key"]
+    FactMovement -> DimTransactionType [label="Transaction Type Key"]
+    FactMovement -> Lineage [label="Lineage Key"]
+    
+    // Fact.Transaction relationships
+    FactTransaction -> DimDate [label="Date Key"]
+    FactTransaction -> DimCustomer [label="Customer Key"]
+    FactTransaction -> DimCustomer [label="Bill To Customer Key"]
+    FactTransaction -> DimSupplier [label="Supplier Key"]
+    FactTransaction -> DimTransactionType [label="Transaction Type Key"]
+    FactTransaction -> DimPaymentMethod [label="Payment Method Key"]
+    FactTransaction -> Lineage [label="Lineage Key"]
+    
+    // Fact.Stock Holding relationships
+    FactStockHolding -> DimStockItem [label="Stock Item Key"]
+    FactStockHolding -> Lineage [label="Lineage Key"]
+    
+    // Dimension to Lineage relationships
+    DimCity -> Lineage [label="Lineage Key"]
+    DimCustomer -> Lineage [label="Lineage Key"]
+    DimEmployee -> Lineage [label="Lineage Key"]
+    DimPaymentMethod -> Lineage [label="Lineage Key"]
+    DimStockItem -> Lineage [label="Lineage Key"]
+    DimSupplier -> Lineage [label="Lineage Key"]
+    DimTransactionType -> Lineage [label="Lineage Key"]
+
+    // Legend
+    subgraph cluster_legend {
+        label="Legend"
+        style=filled
+        fillcolor="#FAFAFA"
+        fontsize=12
+        
+        legend_dim [
+            label="Dimension Table\n(Slowly Changing)"
+            shape=box
+            fillcolor="#BBDEFB"
+            style=filled
+        ]
+        
+        legend_fact [
+            label="Fact Table\n(Columnstore + Partitioned)"
+            shape=box
+            fillcolor="#FFE0B2"
+            style=filled
+        ]
+        
+        legend_staging [
+            label="Staging Table\n(ETL Integration)"
+            shape=box
+            fillcolor="#C8E6C9"
+            style=filled
+        ]
+        
+        legend_meta [
+            label="Metadata Table\n(ETL Control)"
+            shape=box
+            fillcolor="#A5D6A7"
+            style=filled
+        ]
+    }
+}
