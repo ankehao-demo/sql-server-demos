@@ -1,0 +1,404 @@
+// Wide World Importers OLTP Database - Entity Relationship Diagram
+// Generated for SQL Server to PostgreSQL Migration Assessment
+
+digraph WWI_OLTP {
+    // Graph settings
+    graph [
+        rankdir=TB
+        splines=ortho
+        nodesep=0.8
+        ranksep=1.2
+        fontname="Helvetica"
+        fontsize=12
+        label="Wide World Importers OLTP Database\nEntity Relationship Diagram\n(Temporal tables marked with clock icon)"
+        labelloc=t
+        bgcolor="white"
+    ]
+    
+    node [
+        shape=record
+        fontname="Helvetica"
+        fontsize=10
+        style=filled
+    ]
+    
+    edge [
+        fontname="Helvetica"
+        fontsize=8
+        arrowhead=crow
+        arrowtail=none
+    ]
+
+    // ==================== APPLICATION SCHEMA ====================
+    subgraph cluster_Application {
+        label="Application Schema"
+        style=filled
+        fillcolor="#E8F4FD"
+        fontsize=14
+        fontcolor="#1565C0"
+        
+        // Temporal Tables (light blue)
+        People [
+            label="{Application.People|PersonID (PK)\l|FullName\lPreferredName\lSearchName (computed)\lIsPermittedToLogon\lLogonName\lHashedPassword\lIsSystemUser\lIsEmployee\lIsSalesperson\lUserPreferences\lPhoneNumber\lFaxNumber\lEmailAddress\lPhoto (varbinary)\lCustomFields (JSON)\lOtherLanguages (computed)\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        Cities [
+            label="{Application.Cities|CityID (PK)\l|CityName\lStateProvinceID (FK)\lLocation (geography)\lLatestRecordedPopulation\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        Countries [
+            label="{Application.Countries|CountryID (PK)\l|CountryName\lFormalName\lIsoAlpha3Code\lIsoNumericCode\lCountryType\lLatestRecordedPopulation\lContinent\lRegion\lSubregion\lBorder (geography)\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        StateProvinces [
+            label="{Application.StateProvinces|StateProvinceID (PK)\l|StateProvinceCode\lStateProvinceName\lCountryID (FK)\lSalesTerritory\lBorder (geography)\lLatestRecordedPopulation\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        DeliveryMethods [
+            label="{Application.DeliveryMethods|DeliveryMethodID (PK)\l|DeliveryMethodName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        PaymentMethods [
+            label="{Application.PaymentMethods|PaymentMethodID (PK)\l|PaymentMethodName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        TransactionTypes [
+            label="{Application.TransactionTypes|TransactionTypeID (PK)\l|TransactionTypeName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#B3E5FC"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        // Non-temporal tables
+        SystemParameters [
+            label="{Application.SystemParameters|SystemParameterID (PK)\l|DeliveryAddressLine1\lDeliveryAddressLine2\lDeliveryCityID (FK)\lDeliveryPostalCode\lDeliveryLocation (geography)\lPostalAddressLine1\lPostalAddressLine2\lPostalCityID (FK)\lPostalPostalCode\lApplicationSettings\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#E3F2FD"
+        ]
+    }
+
+    // ==================== SALES SCHEMA ====================
+    subgraph cluster_Sales {
+        label="Sales Schema"
+        style=filled
+        fillcolor="#FFF3E0"
+        fontsize=14
+        fontcolor="#E65100"
+        
+        // Temporal Tables
+        Customers [
+            label="{Sales.Customers|CustomerID (PK)\l|CustomerName\lBillToCustomerID (FK)\lCustomerCategoryID (FK)\lBuyingGroupID (FK)\lPrimaryContactPersonID (FK)\lAlternateContactPersonID (FK)\lDeliveryMethodID (FK)\lDeliveryCityID (FK)\lPostalCityID (FK)\lCreditLimit\lAccountOpenedDate\lStandardDiscountPercentage\lIsStatementSent\lIsOnCreditHold\lPaymentDays\lPhoneNumber\lFaxNumber\lDeliveryRun\lRunPosition\lWebsiteURL\lDeliveryAddressLine1\lDeliveryAddressLine2\lDeliveryPostalCode\lDeliveryLocation (geography)\lPostalAddressLine1\lPostalAddressLine2\lPostalPostalCode\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#FFE0B2"
+            tooltip="TEMPORAL TABLE + RLS"
+        ]
+        
+        CustomerCategories [
+            label="{Sales.CustomerCategories|CustomerCategoryID (PK)\l|CustomerCategoryName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#FFE0B2"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        BuyingGroups [
+            label="{Sales.BuyingGroups|BuyingGroupID (PK)\l|BuyingGroupName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#FFE0B2"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        // Non-temporal tables
+        Orders [
+            label="{Sales.Orders|OrderID (PK)\l|CustomerID (FK)\lSalespersonPersonID (FK)\lPickedByPersonID (FK)\lContactPersonID (FK)\lBackorderOrderID (FK)\lOrderDate\lExpectedDeliveryDate\lCustomerPurchaseOrderNumber\lIsUndersupplyBackordered\lComments\lDeliveryInstructions\lInternalComments\lPickingCompletedWhen\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+        ]
+        
+        OrderLines [
+            label="{Sales.OrderLines|OrderLineID (PK)\l|OrderID (FK)\lStockItemID (FK)\lDescription\lPackageTypeID (FK)\lQuantity\lUnitPrice\lTaxRate\lPickedQuantity\lPickingCompletedWhen\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+            tooltip="COLUMNSTORE INDEX"
+        ]
+        
+        Invoices [
+            label="{Sales.Invoices|InvoiceID (PK)\l|CustomerID (FK)\lBillToCustomerID (FK)\lOrderID (FK)\lDeliveryMethodID (FK)\lContactPersonID (FK)\lAccountsPersonID (FK)\lSalespersonPersonID (FK)\lPackedByPersonID (FK)\lInvoiceDate\lCustomerPurchaseOrderNumber\lIsCreditNote\lCreditNoteReason\lComments\lDeliveryInstructions\lInternalComments\lTotalDryItems\lTotalChillerItems\lDeliveryRun\lRunPosition\lReturnedDeliveryData (JSON)\lConfirmedDeliveryTime (computed)\lConfirmedReceivedBy (computed)\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+        ]
+        
+        InvoiceLines [
+            label="{Sales.InvoiceLines|InvoiceLineID (PK)\l|InvoiceID (FK)\lStockItemID (FK)\lDescription\lPackageTypeID (FK)\lQuantity\lUnitPrice\lTaxRate\lTaxAmount\lLineProfit\lExtendedPrice\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+        ]
+        
+        CustomerTransactions [
+            label="{Sales.CustomerTransactions|CustomerTransactionID (PK)\l|CustomerID (FK)\lTransactionTypeID (FK)\lInvoiceID (FK)\lPaymentMethodID (FK)\lTransactionDate\lAmountExcludingTax\lTaxAmount\lTransactionAmount\lOutstandingBalance\lFinalizationDate\lIsFinalized\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+        ]
+        
+        SpecialDeals [
+            label="{Sales.SpecialDeals|SpecialDealID (PK)\l|StockItemID (FK)\lCustomerID (FK)\lBuyingGroupID (FK)\lCustomerCategoryID (FK)\lStockGroupID (FK)\lDealDescription\lStartDate\lEndDate\lDiscountAmount\lDiscountPercentage\lUnitPrice\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#FFF8E1"
+        ]
+    }
+
+    // ==================== PURCHASING SCHEMA ====================
+    subgraph cluster_Purchasing {
+        label="Purchasing Schema"
+        style=filled
+        fillcolor="#F3E5F5"
+        fontsize=14
+        fontcolor="#7B1FA2"
+        
+        // Temporal Tables
+        Suppliers [
+            label="{Purchasing.Suppliers|SupplierID (PK)\l|SupplierName\lSupplierCategoryID (FK)\lPrimaryContactPersonID (FK)\lAlternateContactPersonID (FK)\lDeliveryMethodID (FK)\lDeliveryCityID (FK)\lPostalCityID (FK)\lSupplierReference\lBankAccountName (MASKED)\lBankAccountBranch (MASKED)\lBankAccountCode (MASKED)\lBankAccountNumber (MASKED)\lBankInternationalCode (MASKED)\lPaymentDays\lInternalComments\lPhoneNumber\lFaxNumber\lWebsiteURL\lDeliveryAddressLine1\lDeliveryAddressLine2\lDeliveryPostalCode\lDeliveryLocation (geography)\lPostalAddressLine1\lPostalAddressLine2\lPostalPostalCode\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#E1BEE7"
+            tooltip="TEMPORAL TABLE + DATA MASKING"
+        ]
+        
+        SupplierCategories [
+            label="{Purchasing.SupplierCategories|SupplierCategoryID (PK)\l|SupplierCategoryName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#E1BEE7"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        // Non-temporal tables
+        PurchaseOrders [
+            label="{Purchasing.PurchaseOrders|PurchaseOrderID (PK)\l|SupplierID (FK)\lOrderDate\lDeliveryMethodID (FK)\lContactPersonID (FK)\lExpectedDeliveryDate\lSupplierReference\lIsOrderFinalized\lComments\lInternalComments\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#F3E5F5"
+        ]
+        
+        PurchaseOrderLines [
+            label="{Purchasing.PurchaseOrderLines|PurchaseOrderLineID (PK)\l|PurchaseOrderID (FK)\lStockItemID (FK)\lOrderedOuters\lDescription\lReceivedOuters\lPackageTypeID (FK)\lExpectedUnitPricePerOuter\lLastReceiptDate\lIsOrderLineFinalized\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#F3E5F5"
+        ]
+        
+        SupplierTransactions [
+            label="{Purchasing.SupplierTransactions|SupplierTransactionID (PK)\l|SupplierID (FK)\lTransactionTypeID (FK)\lPurchaseOrderID (FK)\lPaymentMethodID (FK)\lTransactionDate\lAmountExcludingTax\lTaxAmount\lTransactionAmount\lOutstandingBalance\lFinalizationDate\lIsFinalized\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#F3E5F5"
+        ]
+    }
+
+    // ==================== WAREHOUSE SCHEMA ====================
+    subgraph cluster_Warehouse {
+        label="Warehouse Schema"
+        style=filled
+        fillcolor="#E8F5E9"
+        fontsize=14
+        fontcolor="#2E7D32"
+        
+        // Temporal Tables
+        StockItems [
+            label="{Warehouse.StockItems|StockItemID (PK)\l|StockItemName\lSupplierID (FK)\lColorID (FK)\lUnitPackageID (FK)\lOuterPackageID (FK)\lBrand\lSize\lLeadTimeDays\lQuantityPerOuter\lIsChillerStock\lBarcode\lTaxRate\lUnitPrice\lRecommendedRetailPrice\lTypicalWeightPerUnit\lMarketingComments\lInternalComments\lPhoto (varbinary)\lCustomFields (JSON)\lTags (computed)\lSearchDetails (computed)\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#C8E6C9"
+            tooltip="TEMPORAL TABLE + FULL-TEXT"
+        ]
+        
+        Colors [
+            label="{Warehouse.Colors|ColorID (PK)\l|ColorName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#C8E6C9"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        PackageTypes [
+            label="{Warehouse.PackageTypes|PackageTypeID (PK)\l|PackageTypeName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#C8E6C9"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        StockGroups [
+            label="{Warehouse.StockGroups|StockGroupID (PK)\l|StockGroupName\lLastEditedBy (FK)\l|ValidFrom\lValidTo\l}"
+            fillcolor="#C8E6C9"
+            tooltip="TEMPORAL TABLE"
+        ]
+        
+        ColdRoomTemperatures [
+            label="{Warehouse.ColdRoomTemperatures|ColdRoomTemperatureID (PK)\l|ColdRoomSensorNumber\lRecordedWhen\lTemperature\l|ValidFrom\lValidTo\l}"
+            fillcolor="#A5D6A7"
+            tooltip="MEMORY-OPTIMIZED + TEMPORAL"
+        ]
+        
+        // Non-temporal tables
+        StockItemHoldings [
+            label="{Warehouse.StockItemHoldings|StockItemID (PK, FK)\l|QuantityOnHand\lBinLocation\lLastStocktakeQuantity\lLastCostPrice\lReorderLevel\lTargetStockLevel\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#E8F5E9"
+        ]
+        
+        StockItemTransactions [
+            label="{Warehouse.StockItemTransactions|StockItemTransactionID (PK)\l|StockItemID (FK)\lTransactionTypeID (FK)\lCustomerID (FK)\lInvoiceID (FK)\lSupplierID (FK)\lPurchaseOrderID (FK)\lTransactionOccurredWhen\lQuantity\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#E8F5E9"
+        ]
+        
+        StockItemStockGroups [
+            label="{Warehouse.StockItemStockGroups|StockItemStockGroupID (PK)\l|StockItemID (FK)\lStockGroupID (FK)\lLastEditedBy (FK)\lLastEditedWhen\l}"
+            fillcolor="#E8F5E9"
+        ]
+        
+        VehicleTemperatures [
+            label="{Warehouse.VehicleTemperatures|VehicleTemperatureID (PK)\l|VehicleRegistration\lChillerSensorNumber\lRecordedWhen\lTemperature\lFullSensorData (JSON)\lIsCompressed\lCompressedSensorData (varbinary)\l}"
+            fillcolor="#A5D6A7"
+            tooltip="MEMORY-OPTIMIZED"
+        ]
+    }
+
+    // ==================== RELATIONSHIPS ====================
+    
+    // Application Schema Relationships
+    Cities -> StateProvinces [label="StateProvinceID"]
+    Cities -> People [label="LastEditedBy"]
+    StateProvinces -> Countries [label="CountryID"]
+    StateProvinces -> People [label="LastEditedBy"]
+    Countries -> People [label="LastEditedBy"]
+    DeliveryMethods -> People [label="LastEditedBy"]
+    PaymentMethods -> People [label="LastEditedBy"]
+    TransactionTypes -> People [label="LastEditedBy"]
+    SystemParameters -> Cities [label="DeliveryCityID"]
+    SystemParameters -> Cities [label="PostalCityID"]
+    SystemParameters -> People [label="LastEditedBy"]
+    
+    // Sales Schema Relationships
+    Customers -> CustomerCategories [label="CustomerCategoryID"]
+    Customers -> BuyingGroups [label="BuyingGroupID"]
+    Customers -> Customers [label="BillToCustomerID"]
+    Customers -> People [label="PrimaryContactPersonID"]
+    Customers -> People [label="AlternateContactPersonID"]
+    Customers -> DeliveryMethods [label="DeliveryMethodID"]
+    Customers -> Cities [label="DeliveryCityID"]
+    Customers -> Cities [label="PostalCityID"]
+    Customers -> People [label="LastEditedBy"]
+    CustomerCategories -> People [label="LastEditedBy"]
+    BuyingGroups -> People [label="LastEditedBy"]
+    
+    Orders -> Customers [label="CustomerID"]
+    Orders -> People [label="SalespersonPersonID"]
+    Orders -> People [label="PickedByPersonID"]
+    Orders -> People [label="ContactPersonID"]
+    Orders -> Orders [label="BackorderOrderID"]
+    Orders -> People [label="LastEditedBy"]
+    
+    OrderLines -> Orders [label="OrderID"]
+    OrderLines -> StockItems [label="StockItemID"]
+    OrderLines -> PackageTypes [label="PackageTypeID"]
+    OrderLines -> People [label="LastEditedBy"]
+    
+    Invoices -> Customers [label="CustomerID"]
+    Invoices -> Customers [label="BillToCustomerID"]
+    Invoices -> Orders [label="OrderID"]
+    Invoices -> DeliveryMethods [label="DeliveryMethodID"]
+    Invoices -> People [label="ContactPersonID"]
+    Invoices -> People [label="AccountsPersonID"]
+    Invoices -> People [label="SalespersonPersonID"]
+    Invoices -> People [label="PackedByPersonID"]
+    Invoices -> People [label="LastEditedBy"]
+    
+    InvoiceLines -> Invoices [label="InvoiceID"]
+    InvoiceLines -> StockItems [label="StockItemID"]
+    InvoiceLines -> PackageTypes [label="PackageTypeID"]
+    InvoiceLines -> People [label="LastEditedBy"]
+    
+    CustomerTransactions -> Customers [label="CustomerID"]
+    CustomerTransactions -> TransactionTypes [label="TransactionTypeID"]
+    CustomerTransactions -> Invoices [label="InvoiceID"]
+    CustomerTransactions -> PaymentMethods [label="PaymentMethodID"]
+    CustomerTransactions -> People [label="LastEditedBy"]
+    
+    SpecialDeals -> StockItems [label="StockItemID"]
+    SpecialDeals -> Customers [label="CustomerID"]
+    SpecialDeals -> BuyingGroups [label="BuyingGroupID"]
+    SpecialDeals -> CustomerCategories [label="CustomerCategoryID"]
+    SpecialDeals -> StockGroups [label="StockGroupID"]
+    SpecialDeals -> People [label="LastEditedBy"]
+    
+    // Purchasing Schema Relationships
+    Suppliers -> SupplierCategories [label="SupplierCategoryID"]
+    Suppliers -> People [label="PrimaryContactPersonID"]
+    Suppliers -> People [label="AlternateContactPersonID"]
+    Suppliers -> DeliveryMethods [label="DeliveryMethodID"]
+    Suppliers -> Cities [label="DeliveryCityID"]
+    Suppliers -> Cities [label="PostalCityID"]
+    Suppliers -> People [label="LastEditedBy"]
+    SupplierCategories -> People [label="LastEditedBy"]
+    
+    PurchaseOrders -> Suppliers [label="SupplierID"]
+    PurchaseOrders -> DeliveryMethods [label="DeliveryMethodID"]
+    PurchaseOrders -> People [label="ContactPersonID"]
+    PurchaseOrders -> People [label="LastEditedBy"]
+    
+    PurchaseOrderLines -> PurchaseOrders [label="PurchaseOrderID"]
+    PurchaseOrderLines -> StockItems [label="StockItemID"]
+    PurchaseOrderLines -> PackageTypes [label="PackageTypeID"]
+    PurchaseOrderLines -> People [label="LastEditedBy"]
+    
+    SupplierTransactions -> Suppliers [label="SupplierID"]
+    SupplierTransactions -> TransactionTypes [label="TransactionTypeID"]
+    SupplierTransactions -> PurchaseOrders [label="PurchaseOrderID"]
+    SupplierTransactions -> PaymentMethods [label="PaymentMethodID"]
+    SupplierTransactions -> People [label="LastEditedBy"]
+    
+    // Warehouse Schema Relationships
+    StockItems -> Suppliers [label="SupplierID"]
+    StockItems -> Colors [label="ColorID"]
+    StockItems -> PackageTypes [label="UnitPackageID"]
+    StockItems -> PackageTypes [label="OuterPackageID"]
+    StockItems -> People [label="LastEditedBy"]
+    Colors -> People [label="LastEditedBy"]
+    PackageTypes -> People [label="LastEditedBy"]
+    StockGroups -> People [label="LastEditedBy"]
+    
+    StockItemHoldings -> StockItems [label="StockItemID"]
+    StockItemHoldings -> People [label="LastEditedBy"]
+    
+    StockItemTransactions -> StockItems [label="StockItemID"]
+    StockItemTransactions -> TransactionTypes [label="TransactionTypeID"]
+    StockItemTransactions -> Customers [label="CustomerID"]
+    StockItemTransactions -> Invoices [label="InvoiceID"]
+    StockItemTransactions -> Suppliers [label="SupplierID"]
+    StockItemTransactions -> PurchaseOrders [label="PurchaseOrderID"]
+    StockItemTransactions -> People [label="LastEditedBy"]
+    
+    StockItemStockGroups -> StockItems [label="StockItemID"]
+    StockItemStockGroups -> StockGroups [label="StockGroupID"]
+    StockItemStockGroups -> People [label="LastEditedBy"]
+
+    // Legend
+    subgraph cluster_legend {
+        label="Legend"
+        style=filled
+        fillcolor="#FAFAFA"
+        fontsize=12
+        
+        legend_temporal [
+            label="Temporal Table\n(System-Versioned)"
+            shape=box
+            fillcolor="#B3E5FC"
+            style=filled
+        ]
+        
+        legend_memory [
+            label="Memory-Optimized\nTable"
+            shape=box
+            fillcolor="#A5D6A7"
+            style=filled
+        ]
+        
+        legend_regular [
+            label="Regular Table"
+            shape=box
+            fillcolor="#FFFFFF"
+            style=filled
+        ]
+        
+        legend_masked [
+            label="Contains Dynamic\nData Masking"
+            shape=box
+            fillcolor="#E1BEE7"
+            style=filled
+        ]
+    }
+}
