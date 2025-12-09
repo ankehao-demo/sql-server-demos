@@ -11,8 +11,8 @@ CREATE SCHEMA IF NOT EXISTS dimension;
 CREATE SCHEMA IF NOT EXISTS fact;
 CREATE SCHEMA IF NOT EXISTS integration;
 
--- Note: sequences schema already exists from OLTP migration
--- CREATE SCHEMA IF NOT EXISTS sequences;
+-- Create sequences schema (may already exist from OLTP migration)
+CREATE SCHEMA IF NOT EXISTS sequences;
 
 -- Add comments to schemas
 COMMENT ON SCHEMA dimension IS 'Data warehouse dimension tables for star schema';
