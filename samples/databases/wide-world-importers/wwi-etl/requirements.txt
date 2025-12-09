@@ -1,0 +1,11 @@
+# Wide World Importers ETL Dependencies
+# PostgreSQL-compatible ETL solution replacing SQL Server SSIS packages
+
+# PostgreSQL database adapter
+psycopg2-binary>=2.9.0
+
+# Optional: For scheduling ETL jobs (alternative to SQL Server Agent)
+# apscheduler>=3.10.0
+
+# Optional: For enhanced logging and monitoring
+# structlog>=23.0.0
