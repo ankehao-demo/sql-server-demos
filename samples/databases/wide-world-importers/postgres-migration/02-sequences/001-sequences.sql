@@ -1,0 +1,39 @@
+-- Wide World Importers PostgreSQL Migration
+-- Phase 2: OLTP Schema Migration
+-- Sequence definitions (converted from SQL Server SEQUENCE objects)
+
+-- Application sequences
+CREATE SEQUENCE IF NOT EXISTS sequences.city_id START WITH 38187 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.country_id START WITH 242 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.delivery_method_id START WITH 11 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.payment_method_id START WITH 5 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.person_id START WITH 3262 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.state_province_id START WITH 54 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.system_parameter_id START WITH 2 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.transaction_type_id START WITH 14 INCREMENT BY 1;
+
+-- Purchasing sequences
+CREATE SEQUENCE IF NOT EXISTS sequences.purchase_order_id START WITH 2075 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.purchase_order_line_id START WITH 8368 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.supplier_category_id START WITH 10 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.supplier_id START WITH 14 INCREMENT BY 1;
+
+-- Sales sequences
+CREATE SEQUENCE IF NOT EXISTS sequences.buying_group_id START WITH 4 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.customer_category_id START WITH 9 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.customer_id START WITH 1062 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.invoice_id START WITH 70511 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.invoice_line_id START WITH 228266 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.order_id START WITH 73596 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.order_line_id START WITH 231413 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.special_deal_id START WITH 3 INCREMENT BY 1;
+
+-- Warehouse sequences
+CREATE SEQUENCE IF NOT EXISTS sequences.color_id START WITH 37 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.package_type_id START WITH 15 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.stock_group_id START WITH 11 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.stock_item_id START WITH 228 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS sequences.stock_item_stock_group_id START WITH 443 INCREMENT BY 1;
+
+-- Shared transaction sequence (used by CustomerTransactions, SupplierTransactions, StockItemTransactions)
+CREATE SEQUENCE IF NOT EXISTS sequences.transaction_id START WITH 336253 INCREMENT BY 1;
