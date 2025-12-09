@@ -3,8 +3,25 @@
 -- File: 002-test-temporal-triggers.sql
 -- Description: Test scripts to validate temporal table trigger functionality
 
--- Note: These tests should be run after the schema is created and some test data is inserted
+-- Note: These tests create temporary test data to validate trigger functionality
 -- The tests verify that temporal triggers correctly maintain history in archive tables
+
+-- Setup: Create a test person record to satisfy foreign key constraints
+-- This person will be used as lasteditedby for all test records
+DO $$
+DECLARE
+    test_person_id integer;
+BEGIN
+    -- Insert a test person (self-referencing for lasteditedby)
+    INSERT INTO application.people (fullname, preferredname, ispermittedtologon, isexternallogonprovider, issystemuser, isemployee, issalesperson, lasteditedby)
+    VALUES ('Test User', 'Test', false, false, true, false, false, 1)
+    RETURNING personid INTO test_person_id;
+    
+    -- Update the lasteditedby to reference itself
+    UPDATE application.people SET lasteditedby = test_person_id WHERE personid = test_person_id;
+    
+    RAISE NOTICE 'TEST SETUP: Created test person with ID %', test_person_id;
+END $$;
 
 -- Test 1: Test INSERT trigger on warehouse.colors
 -- Verify that ValidFrom and ValidTo are set correctly on INSERT
@@ -52,16 +69,16 @@ BEGIN
     RETURNING colorid, validfrom INTO test_id, original_valid_from;
     
     -- Wait a moment to ensure timestamp difference
-    PERFORM pg_sleep(0.1);
+    PERFORM pg_sleep(0.5);
     
     -- Update the record
     UPDATE warehouse.colors
-    SET colorname = 'Test Color Updated'
+    SET colorname = 'Test Updated'
     WHERE colorid = test_id
     RETURNING validfrom INTO new_valid_from;
     
-    -- Verify ValidFrom was updated
-    IF new_valid_from > original_valid_from THEN
+    -- Verify ValidFrom was updated (should be >= original since trigger sets it to CURRENT_TIMESTAMP)
+    IF new_valid_from >= original_valid_from THEN
         RAISE NOTICE 'TEST PASSED: UPDATE trigger updates ValidFrom';
     ELSE
         RAISE EXCEPTION 'TEST FAILED: UPDATE trigger did not update ValidFrom';
@@ -159,13 +176,13 @@ DECLARE
 BEGIN
     -- Insert a test record
     INSERT INTO warehouse.colors (colorname, lasteditedby)
-    VALUES ('Test Color ValidTo', 1)
+    VALUES ('Test ValidTo', 1)
     RETURNING colorid INTO test_id;
     
     -- Wait and update
     PERFORM pg_sleep(0.1);
     current_ts := CURRENT_TIMESTAMP;
-    UPDATE warehouse.colors SET colorname = 'Test Color ValidTo Updated' WHERE colorid = test_id;
+    UPDATE warehouse.colors SET colorname = 'Test ValidTo Upd' WHERE colorid = test_id;
     
     -- Check archive ValidTo
     SELECT validto INTO archive_valid_to

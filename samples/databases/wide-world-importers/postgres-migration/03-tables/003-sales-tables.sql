@@ -105,8 +105,10 @@ CREATE TABLE sales.orderlines (
 );
 
 -- Sales.Invoices table (non-temporal)
--- Note: ConfirmedDeliveryTime and ConfirmedReceivedBy are computed columns from JSON
--- These will be handled via a view or trigger
+-- Note: ConfirmedDeliveryTime and ConfirmedReceivedBy are computed columns in SQL Server
+-- that extract values from the JSON in ReturnedDeliveryData. In PostgreSQL, GENERATED columns
+-- require immutable expressions, but JSON operations are not immutable. Therefore, we create
+-- a view (sales.invoices_with_delivery) that provides these computed values.
 CREATE TABLE sales.invoices (
     invoiceid integer NOT NULL DEFAULT nextval('sequences.invoiceid'),
     customerid integer NOT NULL,
@@ -135,6 +137,41 @@ CREATE TABLE sales.invoices (
     CONSTRAINT ck_sales_invoices_returneddeliverydata_must_be_valid_json 
         CHECK (returneddeliverydata IS NULL OR returneddeliverydata::jsonb IS NOT NULL)
 );
+
+-- View to provide computed columns ConfirmedDeliveryTime and ConfirmedReceivedBy
+-- This replicates the SQL Server computed column behavior
+CREATE VIEW sales.invoices_with_delivery AS
+SELECT 
+    invoiceid,
+    customerid,
+    billtocustomerid,
+    orderid,
+    deliverymethodid,
+    contactpersonid,
+    accountspersonid,
+    salespersonpersonid,
+    packedbypersonid,
+    invoicedate,
+    customerpurchaseordernumber,
+    iscreditnote,
+    creditnotereason,
+    comments,
+    deliveryinstructions,
+    internalcomments,
+    totaldryitems,
+    totalchilleritems,
+    deliveryrun,
+    runposition,
+    returneddeliverydata,
+    CASE WHEN returneddeliverydata IS NOT NULL 
+         THEN (returneddeliverydata::jsonb->>'DeliveredWhen')::timestamp 
+         ELSE NULL END AS confirmeddeliverytime,
+    CASE WHEN returneddeliverydata IS NOT NULL 
+         THEN returneddeliverydata::jsonb->>'ReceivedBy' 
+         ELSE NULL END AS confirmedreceivedby,
+    lasteditedby,
+    lasteditedwhen
+FROM sales.invoices;
 
 -- Sales.InvoiceLines table (non-temporal)
 -- Note: SQL Server uses columnstore index, PostgreSQL uses regular table

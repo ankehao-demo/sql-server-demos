@@ -105,6 +105,9 @@ CREATE INDEX ix_sales_orderlines_packagetypeid ON sales.orderlines (packagetypei
 CREATE INDEX ix_sales_orderlines_perf_20160301_pickingcompletedwhen ON sales.orderlines (pickingcompletedwhen, orderid, orderlineid) WHERE pickingcompletedwhen IS NOT NULL;
 
 -- Sales.Invoices indexes
+-- Note: ConfirmedDeliveryTime and ConfirmedReceivedBy are computed columns in SQL Server
+-- that are provided via the sales.invoices_with_delivery view in PostgreSQL.
+-- Indexes on these computed values cannot be created on the base table.
 CREATE INDEX ix_sales_invoices_customerid ON sales.invoices (customerid);
 CREATE INDEX ix_sales_invoices_billtocustomerid ON sales.invoices (billtocustomerid);
 CREATE INDEX ix_sales_invoices_orderid ON sales.invoices (orderid);
@@ -114,8 +117,6 @@ CREATE INDEX ix_sales_invoices_accountspersonid ON sales.invoices (accountsperso
 CREATE INDEX ix_sales_invoices_salespersonpersonid ON sales.invoices (salespersonpersonid);
 CREATE INDEX ix_sales_invoices_packedbypersonid ON sales.invoices (packedbypersonid);
 CREATE INDEX ix_sales_invoices_invoicedate ON sales.invoices (invoicedate);
-CREATE INDEX ix_sales_invoices_confirmeddeliverytime ON sales.invoices (confirmeddeliverytime);
-CREATE INDEX ix_sales_invoices_perf_20160301_confirmeddeliverytime ON sales.invoices (confirmeddeliverytime) INCLUDE (confirmedreceivedby) WHERE confirmeddeliverytime IS NOT NULL;
 
 -- Sales.InvoiceLines indexes
 CREATE INDEX ix_sales_invoicelines_invoiceid ON sales.invoicelines (invoiceid);

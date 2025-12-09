@@ -131,14 +131,17 @@ BEGIN
 END $$;
 
 -- Test 8: Verify temporal triggers exist
+-- Note: Using pg_trigger instead of information_schema.triggers because the latter
+-- counts each trigger event (INSERT, UPDATE, DELETE) separately
 DO $$
 DECLARE
     trigger_count integer;
     expected_count integer := 17;
 BEGIN
-    SELECT COUNT(*) INTO trigger_count
-    FROM information_schema.triggers
-    WHERE trigger_name LIKE 'tr_%_temporal';
+    SELECT COUNT(DISTINCT tgname) INTO trigger_count
+    FROM pg_trigger
+    WHERE tgname LIKE 'tr_%_temporal'
+    AND NOT tgisinternal;
     
     IF trigger_count = expected_count THEN
         RAISE NOTICE 'TEST PASSED: All % temporal triggers exist', expected_count;
