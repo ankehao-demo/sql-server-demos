@@ -102,4 +102,4 @@ EXCEPTION
 END;
 $$;
 
-RAISE NOTICE '=== Function Tests Complete ===';
+DO $$ BEGIN RAISE NOTICE '=== Function Tests Complete ==='; END; $$;

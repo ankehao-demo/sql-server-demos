@@ -454,4 +454,4 @@ BEGIN
 END;
 $$;
 
-RAISE NOTICE '=== Procedure Tests Complete ===';
+DO $$ BEGIN RAISE NOTICE '=== Procedure Tests Complete ==='; END; $$;
