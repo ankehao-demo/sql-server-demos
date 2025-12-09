@@ -42,4 +42,4 @@ COMMENT ON COLUMN dimension.city.latest_recorded_population IS 'Latest available
 COMMENT ON COLUMN dimension.city.valid_from IS 'Valid from this date and time';
 COMMENT ON COLUMN dimension.city.valid_to IS 'Valid until this date and time';
 COMMENT ON COLUMN dimension.city.lineage_key IS 'Lineage Key for the data load for this row';
-COMMENT ON INDEX ix_dimension_city_wwi_city_id IS 'Allows quickly locating by WWI ID';
+COMMENT ON INDEX dimension.ix_dimension_city_wwi_city_id IS 'Allows quickly locating by WWI ID';

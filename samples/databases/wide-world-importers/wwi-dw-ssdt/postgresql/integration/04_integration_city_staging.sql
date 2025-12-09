@@ -40,4 +40,4 @@ COMMENT ON COLUMN integration.city_staging.location IS 'Geographic location of t
 COMMENT ON COLUMN integration.city_staging.latest_recorded_population IS 'Latest available population for the City';
 COMMENT ON COLUMN integration.city_staging.valid_from IS 'Valid from this date and time';
 COMMENT ON COLUMN integration.city_staging.valid_to IS 'Valid until this date and time';
-COMMENT ON INDEX ix_integration_city_staging_wwi_city_id IS 'Allows quickly locating by WWI City Key';
+COMMENT ON INDEX integration.ix_integration_city_staging_wwi_city_id IS 'Allows quickly locating by WWI City Key';

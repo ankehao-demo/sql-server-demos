@@ -53,4 +53,4 @@ COMMENT ON COLUMN dimension.stock_item.photo IS 'Photo of the product';
 COMMENT ON COLUMN dimension.stock_item.valid_from IS 'Valid from this date and time';
 COMMENT ON COLUMN dimension.stock_item.valid_to IS 'Valid until this date and time';
 COMMENT ON COLUMN dimension.stock_item.lineage_key IS 'Lineage Key for the data load for this row';
-COMMENT ON INDEX ix_dimension_stock_item_wwi_stock_item_id IS 'Allows quickly locating by WWI ID';
+COMMENT ON INDEX dimension.ix_dimension_stock_item_wwi_stock_item_id IS 'Allows quickly locating by WWI ID';

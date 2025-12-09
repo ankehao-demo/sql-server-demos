@@ -36,4 +36,4 @@ COMMENT ON COLUMN fact.stock_holding.last_cost_price IS 'Unit cost when the stoc
 COMMENT ON COLUMN fact.stock_holding.reorder_level IS 'Quantity below which reordering should take place';
 COMMENT ON COLUMN fact.stock_holding.target_stock_level IS 'Typical stock level held';
 COMMENT ON COLUMN fact.stock_holding.lineage_key IS 'Lineage Key for the data load for this row';
-COMMENT ON INDEX ix_fact_stock_holding_stock_item_key IS 'Auto-created to support a foreign key';
+COMMENT ON INDEX fact.ix_fact_stock_holding_stock_item_key IS 'Auto-created to support a foreign key';

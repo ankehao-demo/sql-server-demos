@@ -31,4 +31,4 @@ COMMENT ON COLUMN dimension.employee.photo IS 'Photo of this person';
 COMMENT ON COLUMN dimension.employee.valid_from IS 'Valid from this date and time';
 COMMENT ON COLUMN dimension.employee.valid_to IS 'Valid until this date and time';
 COMMENT ON COLUMN dimension.employee.lineage_key IS 'Lineage Key for the data load for this row';
-COMMENT ON INDEX ix_dimension_employee_wwi_employee_id IS 'Allows quickly locating by WWI ID';
+COMMENT ON INDEX dimension.ix_dimension_employee_wwi_employee_id IS 'Allows quickly locating by WWI ID';
