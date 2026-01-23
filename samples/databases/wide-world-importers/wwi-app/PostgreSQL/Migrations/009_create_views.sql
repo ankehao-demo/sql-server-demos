@@ -42,8 +42,7 @@ SELECT
     s.website_url,
     dm.delivery_method_name AS delivery_method,
     c.city_name,
-    s.delivery_location,
-    s.delivery_run
+    s.delivery_location
 FROM purchasing.suppliers AS s
 LEFT OUTER JOIN purchasing.supplier_categories AS sc ON s.supplier_category_id = sc.supplier_category_id
 LEFT OUTER JOIN application.people AS pp ON s.primary_contact_person_id = pp.person_id
